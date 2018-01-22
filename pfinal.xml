@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+Name:           cdps_pfinal
+Description:    Escenario básico de la practica final de CDPS del curso 2017-18
+
+Departamento de Ingenieria de Sistemas Telematicos (DIT)
+Universidad Politecnica de Madrid
+SPAIN
+
+-->
+
+<vnx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="/usr/share/xml/vnx/vnx-2.00.xsd">
+  <global>
+    <version>2.0</version>
+    <scenario_name>cdps_pfinal</scenario_name>
+    <ssh_key>/root/.ssh/id_rsa.pub</ssh_key>
+    <ssh_key>~/.ssh/id_rsa.pub</ssh_key>
+    <automac/>
+    <!--vm_mgmt type="none" /-->
+    <vm_mgmt type="private" network="10.250.0.0" mask="24" offset="0">
+       <host_mapping />
+    </vm_mgmt>
+    <vm_defaults>
+        <console id="0" display="no"/>
+        <console id="1" display="yes"/>
+    </vm_defaults>
+  </global>
+
+  <net name="LAN1" mode="virtual_bridge" />
+  <net name="LAN2" mode="virtual_bridge" />
+  <net name="LAN3" mode="virtual_bridge" />  
+  <net name="LAN4" mode="virtual_bridge" />
+  <net name="virbr0" mode="virtual_bridge" managed="no"/>
+
+
+  <vm name="c1" type="lxc" arch="x86_64">
+    <filesystem type="cow">filesystems/rootfs_lxc64-cdps</filesystem>
+    <if id="1" net="LAN1">
+      <ipv4>10.1.1.11/24</ipv4>
+    </if>
+    <if id="9" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <route type="ipv4" gw="10.1.1.1">10.1.0.0/16</route>   
+    <forwarding type="ip" />
+  </vm>
+
+  <vm name="c2" type="lxc" arch="x86_64">
+    <filesystem type="cow">filesystems/rootfs_lxc64-cdps</filesystem>
+    <if id="1" net="LAN1">
+      <ipv4>10.1.1.12/24</ipv4>
+    </if>
+    <if id="9" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <route type="ipv4" gw="10.1.1.1">10.1.0.0/16</route>   
+    <forwarding type="ip" />
+  </vm>
+
+  <vm name="fw" type="lxc" arch="x86_64">
+    <filesystem type="cow">filesystems/rootfs_lxc64-cdps</filesystem>
+    <if id="1" net="LAN1">
+      <ipv4>10.1.1.1/24</ipv4>
+    </if>
+    <if id="2" net="LAN2">
+      <ipv4>10.1.2.1/24</ipv4>
+    </if>
+    <if id="9" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <forwarding type="ip" />
+    <route type="ipv4" gw="10.1.2.2">10.1.3.0/24</route>   
+    <route type="ipv4" gw="10.1.2.2">10.1.4.0/24</route>   
+    <filetree seq="on_boot" root="/root/">conf/fw/fw.fwb</filetree>
+  </vm>
+
+  <vm name="lb" type="lxc" arch="x86_64">
+    <filesystem type="cow">filesystems/rootfs_lxc64-cdps</filesystem>
+    <if id="1" net="LAN2">
+      <ipv4>10.1.2.2/24</ipv4>
+    </if>
+    <if id="2" net="LAN3">
+      <ipv4>10.1.3.1/24</ipv4>
+    </if>
+    <if id="9" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <forwarding type="ip" />
+    <route type="ipv4" gw="10.1.2.1">10.1.1.0/24</route>   
+  </vm>
+
+  <vm name="s1" type="lxc" arch="x86_64">
+    <filesystem type="cow">filesystems/rootfs_lxc64-cdps</filesystem>
+    <if id="1" net="LAN3">
+      <ipv4>10.1.3.11/24</ipv4>
+    </if>
+    <if id="2" net="LAN4">
+      <ipv4>10.1.4.11/24</ipv4>
+    </if>
+    <if id="9" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <route type="ipv4" gw="10.1.3.1">10.1.0.0/16</route>   
+    <exec seq="on_boot" type="verbatim">
+        mknod -m 666 /dev/fuse c 10 229;
+    </exec>
+  </vm>
+
+  <vm name="s2" type="lxc" arch="x86_64">
+    <filesystem type="cow">filesystems/rootfs_lxc64-cdps</filesystem>
+    <if id="1" net="LAN3">
+      <ipv4>10.1.3.12/24</ipv4>
+    </if>
+    <if id="2" net="LAN4">
+      <ipv4>10.1.4.12/24</ipv4>
+    </if>
+    <if id="9" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <route type="ipv4" gw="10.1.3.1">10.1.0.0/16</route>   
+    <exec seq="on_boot" type="verbatim">
+        mknod -m 666 /dev/fuse c 10 229;
+    </exec>
+  </vm>
+
+  <vm name="s3" type="lxc" arch="x86_64">
+    <filesystem type="cow">filesystems/rootfs_lxc64-cdps</filesystem>
+    <if id="1" net="LAN3">
+      <ipv4>10.1.3.13/24</ipv4>
+    </if>
+    <if id="2" net="LAN4">
+      <ipv4>10.1.4.13/24</ipv4>
+    </if>
+    <if id="9" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <route type="ipv4" gw="10.1.3.1">10.1.0.0/16</route>   
+    <exec seq="on_boot" type="verbatim">
+        mknod -m 666 /dev/fuse c 10 229;
+    </exec>
+  </vm>
+
+  <vm name="nagios" type="lxc" arch="x86_64">
+    <filesystem type="cow">filesystems/rootfs_lxc64-cdps</filesystem>
+    <if id="1" net="LAN3">
+      <ipv4>10.1.3.15/24</ipv4>
+    </if>
+    <if id="2" net="LAN4">
+      <ipv4>10.1.4.15/24</ipv4>
+    </if>
+    <if id="9" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <route type="ipv4" gw="10.1.3.1">10.1.0.0/16</route>   
+    <exec seq="on_boot" type="verbatim">
+        mknod -m 666 /dev/fuse c 10 229;
+    </exec>
+  </vm>
+
+  <vm name="GES" type="lxc" arch="x86_64">
+	<filesystem type="cow">filesystems/rootfs_lxc64-cdps</filesystem>
+	<if id="1" net="LAN3">
+		<ipv4>10.1.3.20/24</ipv4>
+	</if>
+	<if id="2" net="LAN4">
+		<ipv4>10.1.4.20/24</ipv4>
+	</if>
+	<if id="9" net="virbr0">
+		<ipv4>dhcp</ipv4>
+	</if>
+	<route type="ipv4" gw="10.1.3.1">10.1.0.0/16</route>
+	<exec seq="on_boot" type="verbatim">
+        mknod -m 666 /dev/fuse c 10 229;
+    </exec>
+  </vm>
+  <vm name="bbdd" type="lxc" arch="x86_64">
+    <filesystem type="cow">filesystems/rootfs_lxc64-cdps</filesystem>
+    <!--if id="1" net="LAN3">
+      <ipv4>10.1.3.100/24</ipv4>
+    </if!-->
+    <if id="1" net="LAN4">
+      <ipv4>10.1.4.31/24</ipv4>
+    </if>
+    <if id="9" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <route type="ipv4" gw="10.1.3.1">10.1.0.0/16</route>   
+  </vm>
+
+  <vm name="nas1" type="lxc" arch="x86_64">
+    <filesystem type="cow">filesystems/rootfs_lxc64-cdps</filesystem>
+    <shareddir root="/nas">.nas1</shareddir>
+    <if id="1" net="LAN4">
+      <ipv4>10.1.4.21/24</ipv4>
+    </if>
+    <if id="9" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <exec seq="on_boot" type="verbatim">
+        setfattr -x trusted.glusterfs.volume-id /nas;
+        setfattr -x trusted.gfid /nas;
+        rm -rf /nas/.glusterfs
+    </exec>
+  </vm>
+
+  <vm name="nas2" type="lxc" arch="x86_64">
+    <filesystem type="cow">filesystems/rootfs_lxc64-cdps</filesystem>
+    <shareddir root="/nas">.nas2</shareddir>
+    <if id="1" net="LAN4">
+      <ipv4>10.1.4.22/24</ipv4>
+    </if>
+    <if id="9" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <exec seq="on_boot" type="verbatim">
+        setfattr -x trusted.glusterfs.volume-id /nas;
+        setfattr -x trusted.gfid /nas;
+        rm -rf /nas/.glusterfs
+    </exec>
+  </vm>
+
+  <vm name="nas3" type="lxc" arch="x86_64">
+    <filesystem type="cow">filesystems/rootfs_lxc64-cdps</filesystem>
+    <shareddir root="/nas">.nas3</shareddir>
+    <if id="1" net="LAN4">
+      <ipv4>10.1.4.23/24</ipv4>
+    </if>
+    <if id="9" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <exec seq="on_boot" type="verbatim">
+        setfattr -x trusted.glusterfs.volume-id /nas;
+        setfattr -x trusted.gfid /nas;
+        rm -rf /nas/.glusterfs
+    </exec>
+  </vm>
+
+  <host>
+    <hostif net="LAN1">
+       <ipv4>10.1.1.2/24</ipv4>
+    </hostif>
+    <route type="ipv4" gw="10.1.1.1">10.1.0.0/16</route>
+  </host>
+
+</vnx>
